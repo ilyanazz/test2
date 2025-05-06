@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaderboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensure proper scaling on mobile -->
+  <script type="module" src="firebase.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-image: url('background.jpg'); /* Replace with your image path or URL */
+      background-size: cover;          /* Ensures the background image covers the entire screen */
+      background-repeat: no-repeat;
+      background-attachment: fixed;    /* Keeps the background fixed on scroll */
+      background-position: center;
+      color: #000;
+      min-height: 100vh;               /* Ensures the body takes up at least the full height of the screen */
+      display: flex;
+      justify-content: center;         /* Centers content horizontally */
+      align-items: center;             /* Centers content vertically */
+      text-align: center;              /* Centers text */
+    }
+
+    .overlay {
+      background-color: rgba(255, 255, 255, 0.85); /* White transparent overlay */
+      padding: 20px;
+      margin: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 100%;                     /* Ensures the overlay doesn't overflow */
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+
+    #leaderboard div {
+      margin-bottom: 5px;
+    }
+
+    /* Add mobile responsiveness */
+    @media (max-width: 600px) {
+      .overlay {
+        padding: 15px;
+        margin: 10px;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      #leaderboard {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <h2>Leaderboard</h2>
+    <div id="leaderboard"></div>
+  </div>
+
+  <script type="module">
+    import {
+      db, collection, query, orderBy, onSnapshot
+    } from './firebase.js';
+
+    const leaderboardDiv = document.getElementById("leaderboard");
+
+    const q = query(collection(db, "participants"), orderBy("points", "desc"));
+    onSnapshot(q, (snapshot) => {
+      leaderboardDiv.innerHTML = "";
+      snapshot.forEach((docSnap, idx) => {
+        const d = docSnap.data();
+        const points = d.points || 0;
+        leaderboardDiv.innerHTML += `<div>${idx + 1}. ID: ${docSnap.id} — ${points} pts</div>`;
+      });
+    });
+  </script>
+</body>
+</html>
